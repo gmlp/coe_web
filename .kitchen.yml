@@ -6,23 +6,32 @@ driver:
 
 provisioner:
   name: chef_zero
-  # You may wish to disable always updating cookbooks in CI or other testing environments.
-  # For example:
-  #   always_update_cookbooks: <%= !ENV['CI'] %>
-  always_update_cookbooks: true
 
 verifier:
   name: inspec
 
 platforms:
-  - name: ubuntu-16.04
-  - name: centos-7
+  - name: centos-7.3
+  - name: centos-6.8
 
 suites:
-  - name: default
+  - name: dev
+    driver:
+      run_command: /usr/sbin/init
     run_list:
       - recipe[lcd_web::default]
-    verifier:
-      inspec_tests:
-        - test/smoke/default
-    attributes:
+    attributes: { 'java': { 'jdk_version': '7' } }
+    driver_config:
+      forward:
+        - 8080:80
+    excludes: centos-6.8
+  - name: prod
+    driver:
+      run_command: /sbin/init
+    run_list:
+      - recipe[lcd_web::default]
+    attributes: { 'java': { 'jdk_version': '6' } }
+    driver_config:
+      forward:
+        - 8081:80
+    includes: centos-6.8

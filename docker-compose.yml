@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+  chefdk:
+    image: softtekcoe/chefdk-docker 
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/test
+    command: sleep 1000000000 
+  
+#docker run -d -v /var/run/docker.sock:/var/run/docker.sock --network host softtekcoe/chefdk-docker sleep 1000000000 
+
