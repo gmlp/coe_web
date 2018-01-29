@@ -15,39 +15,53 @@ pipeline {
              sh "echo here run linters"
          }
       }
-      stage('wait for sync') {
-         steps {
-             sh "ls -la && sleep 5"
-         }
-      }
       stage('ChefSpec') {
          steps {
-             sh "docker-compose exec chefdk chef exec rspec"
+             script {
+                sh "docker-compose ps -q chefdk > pid" 
+                def pid=readFile('pid').trim()
+                sh "docker exec ${pid} chef exec rspec"
+             }
          }
       }
       stage('Kitchen Create') {
          steps {
-             sh "docker-compose exec chefdk kitchen create"
+             script {
+                def pid=readFile('pid').trim()
+                sh "docker exec ${pid} kitchen create"
+             }
          }
       }
       stage('Kitchen Converge') {
          steps {
-             sh "docker-compose exec chefdk kitchen converge"
+             script {
+                def pid=readFile('pid').trim()
+                sh "docker exec ${pid} kitchen converge"
+             }
          }
       }
       stage('Kitchen Setup') {
          steps {
-             sh "docker-compose exec chefdk kitchen setup"
+             script {
+                def pid=readFile('pid').trim()
+                sh "docker exec ${pid} kitchen setup"
+             }
          }
       }
       stage('Kitchen Exec Test') {
          steps {
-             sh "docker-compose exec chefdk kitchen verify"
+             script {
+                def pid=readFile('pid').trim()
+                sh "docker exec ${pid} kitchen verify"
+             }
          }
       }
       stage('Kitchen clean up') {
          steps {
-             sh "docker-compose exec chefdk kitchen destroy"
+             script {
+                def pid=readFile('pid').trim()
+                sh "docker exec ${pid} kitchen destroy"
+             }
          }
       }
    }
