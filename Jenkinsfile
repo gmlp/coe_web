@@ -15,6 +15,11 @@ pipeline {
              sh "echo here run linters"
          }
       }
+      stage('wait for sync') {
+         steps {
+             sh "ls -la && sleep 5"
+         }
+      }
       stage('ChefSpec') {
          steps {
              sh "docker-compose exec chefdk chef exec rspec"
