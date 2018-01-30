@@ -12,7 +12,6 @@ verifier:
 
 platforms:
   - name: centos-7.3
-  - name: centos-6.8
 
 suites:
   - name: dev
@@ -20,18 +19,9 @@ suites:
       run_command: /usr/sbin/init
     run_list:
       - recipe[lcd_web::default]
-    attributes: { 'java': { 'jdk_version': '7' } }
     driver_config:
       forward:
         - 8080:80
-    excludes: centos-6.8
-  - name: prod
-    driver:
-      run_command: /sbin/init
-    run_list:
-      - recipe[lcd_web::default]
-    attributes: { 'java': { 'jdk_version': '6' } }
-    driver_config:
-      forward:
-        - 8081:80
-    includes: centos-6.8
+    verifier:
+      inspec_tests:
+        - test/smoke/default
