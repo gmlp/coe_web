@@ -4,9 +4,9 @@
 #
 # Copyright:: 2018, Gonzalo Lopez, All Rights Reserved.
 package 'httpd' do
-    action :install
+  action :install
 end
 
 service 'httpd' do
-    action [:enable, :start]
+  action [:enable, :start]
 end
