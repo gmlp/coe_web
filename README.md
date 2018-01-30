@@ -1,4 +1,9 @@
-# lcd_web
+coe_web
+=======
 
-TODO: Enter the cookbook description here.
+httpd Application server cookbook
+----
 
+> **Note:**
+
+>- This is a sample cookbook.
