@@ -12,13 +12,17 @@ pipeline {
       }
       stage('Lint Validation') {
          steps {
-             sh "echo here run linters"
+             script {
+                sh "docker-compose ps -q chefdk > pid" 
+                def pid=readFile('pid').trim()
+                sh "docker exec ${pid} rubocop -r cookstyle -D --format emacs ."
+                sh "docker exec ${pid} foodcritic ."
+             }
          }
       }
       stage('ChefSpec') {
          steps {
              script {
-                sh "docker-compose ps -q chefdk > pid" 
                 def pid=readFile('pid').trim()
                 sh "docker exec ${pid} chef exec rspec"
              }
