@@ -24,7 +24,7 @@ pipeline {
          steps {
              script {
                 def pid=readFile('pid').trim()
-                sh "docker exec ${pid} chef exec rspec"
+                sh "docker exec ${pid} chef exec rspec --color -fd"
              }
          }
       }
