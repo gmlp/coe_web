@@ -19,9 +19,6 @@ suites:
       run_command: /usr/sbin/init
     run_list:
       - recipe[lcd_web::default]
-    driver_config:
-      forward:
-        - 8080:80
     verifier:
       inspec_tests:
         - test/smoke/default
