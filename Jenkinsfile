@@ -1,9 +1,6 @@
 pipeline {
-    agent { node { label 'test' } }
-  // options {
-  //    // Only keep the 10 most recent builds
-  //    buildDiscarder(logRotator(numToKeepStr:'10'))
-  // }
+   agent { node { label 'test' } }
+
    stages {
       stage('Spin Up') {
          steps {
@@ -65,19 +62,9 @@ pipeline {
              script {
                 def pid=readFile('pid').trim()
                 sh "docker exec ${pid} kitchen destroy"
+                sh "docker-compose down"
              }
          }
       }
    }
-
-  // pending agregations
-  //         sh 'rubocop -r cookstyle -D --format emacs --fail-level E cookbooks'
-  //         sh 'foodcritic ./cookbooks/*/'
-  // post {
-  //    always {
-  //       // Parsing log
-  //       step([$class: 'WarningsPublisher', canRunOnFailed: true, consoleParsers: [[parserName: 'Foodcritic'],[parserName: 'Rubocop']]])
-  //       echo "job terminated : ${currentBuild.result} "
-  //    }
-  // }
 }
