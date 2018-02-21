@@ -1,70 +1,60 @@
 pipeline {
-   agent { node { label 'test' } }
-
-   stages {
-      stage('Spin Up') {
-         steps {
-             sh 'docker-compose up -d'
-         }
-      }
-      stage('Lint Validation') {
-         steps {
-             script {
-                sh "docker-compose ps -q chefdk > pid" 
-                def pid=readFile('pid').trim()
-                sh "docker exec ${pid} rubocop -r cookstyle -D --format emacs ."
-                sh "docker exec ${pid} foodcritic ."
-             }
-         }
-      }
-      stage('ChefSpec') {
-         steps {
-             script {
-                def pid=readFile('pid').trim()
-                sh "docker exec ${pid} chef exec rspec --color -fd"
-             }
-         }
-      }
-      stage('Kitchen Create') {
-         steps {
-             script {
-                def pid=readFile('pid').trim()
-                sh "docker exec ${pid} kitchen create"
-             }
-         }
-      }
-      stage('Kitchen Converge') {
-         steps {
-             script {
-                def pid=readFile('pid').trim()
-                sh "docker exec ${pid} kitchen converge"
-             }
-         }
-      }
-      stage('Kitchen Setup') {
-         steps {
-             script {
-                def pid=readFile('pid').trim()
-                sh "docker exec ${pid} kitchen setup"
-             }
-         }
-      }
-      stage('Kitchen Exec Test') {
-         steps {
-             script {
-                def pid=readFile('pid').trim()
-                sh "docker exec ${pid} kitchen verify"
-             }
-         }
-      }
-      stage('Kitchen clean up') {
-         steps {
-             script {
-                def pid=readFile('pid').trim()
-                sh "docker exec ${pid} kitchen destroy"
-                sh "docker-compose down"
-             }
-         }
-      }
-   }
+    agent { 
+        docker { 
+            image 'softtekcoe/chefdk-docker'
+            args '--net=host' 
+        }
+    }
+    stages {
+		stage('Linting and unit testing') {
+			parallel {
+				stage('Rubocop') {
+					steps {
+                        sh "rubocop -r cookstyle -D --format emacs --fail-level E cookbooks"
+					}
+				}
+				stage('Foodcritic') {
+					steps {
+						sh "foodcritic ./cookbooks/*/"
+					}
+				}
+				stage('ChefSpec') {
+					steps {
+						sh "chef exec rspec --color -fd cookbooks/**/spec/unit/recipes/*.rb"
+					}
+				}
+			}
+		}
+        stage('Kitchen Create') {
+            steps {
+                sh "kitchen create"
+            }
+        }
+        stage('Kitchen Converge') {
+            steps {
+                sh "kitchen converge"
+            }
+        }
+        stage('Kitchen Setup') {
+            steps {
+                sh "kitchen setup"
+            }
+        }
+        stage('Kitchen Exec Test') {
+            steps {
+                sh "kitchen verify"
+            }
+        }
+        stage('Kitchen clean up') {
+            steps {
+                sh "kitchen destroy"
+            }
+        }
+    }
+    post {
+        always {
+            warnings canRunOnFailed: true, consoleParsers: [[parserName: 'Foodcritic'],[parserName: 'Rubocop']]
+            echo "job terminated : ${currentBuild.result}"
+        }
+    }
 }

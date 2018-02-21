@@ -1,16 +1,18 @@
 # # encoding: utf-8
 
-# Inspec test for recipe lcd_web::default
+# Inspec test for recipe chef_coe_web::default
 
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/
 
-describe package('httpd') do
-  it { should be_installed }
+unless os.windows?
+  describe user('root') do
+    it { should exist }
+    skip 'This is an example test, replace with your own test.'
+  end
 end
 
-describe service('httpd') do
-  it { should be_installed }
-  it { should be_enabled }
-  it { should be_running }
+describe port(80) do
+  it { should_not be_listening }
+  skip 'This is an example test, replace with your own test.'
 end

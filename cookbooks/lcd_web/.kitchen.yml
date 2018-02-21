@@ -1,0 +1,24 @@
+---
+driver:
+  name: docker
+  privileged: true
+  use_sudo: false 
+
+provisioner:
+  name: chef_zero
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: centos-7.3
+
+suites:
+  - name: dev
+    driver:
+      run_command: /usr/sbin/init
+    run_list:
+      - recipe[lcd_web::default]
+    verifier:
+      inspec_tests:
+        - test/smoke/default
