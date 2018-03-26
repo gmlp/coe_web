@@ -18,11 +18,11 @@ pipeline {
 						sh "foodcritic ./cookbooks/*/"
 					}
 				}
-				stage('ChefSpec') {
-					steps {
-						sh "chef exec rspec --color -fd cookbooks/**/spec/unit/recipes/*.rb"
-					}
-				}
+		//		stage('ChefSpec') {
+		//			steps {
+		//				sh "chef exec rspec --color -fd cookbooks/**/spec/unit/recipes/*.rb"
+		//			}
+		//		}
 			}
 		}
         stage('Kitchen Create') {
