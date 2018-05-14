@@ -10,6 +10,7 @@ pipeline {
 			parallel {
 				stage('Rubocop') {
 					steps {
+                        sh "rubocop -V"
                         sh "rubocop -r cookstyle -D --format emacs --fail-level E cookbooks"
 					}
 				}
